@@ -1,0 +1,125 @@
+<html>
+  <head>
+    
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <style>
+      iframe {
+        width: 100%;
+        border: 0;
+        min-height: 80%;
+        height: 600px;
+        display: flex;
+      }
+    </style>
+    
+    
+    <script type="text/javascript">
+      var CLIENT_ID = '86147487643-f0nqrselsgflhdr10s0ej9g09qicdkjr.apps.googleusercontent.com';
+      var SCOPES = ['https://mail.google.com/','https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/gmail.send','https://www.googleapis.com/auth/gmail.modify'];
+      var messageId;
+      
+      function checkAuth() {
+        gapi.auth.authorize(
+          {
+            'client_id': CLIENT_ID,
+            'scope': SCOPES.join(' '),
+            'immediate': true
+          }, handleAuthResult);
+        }
+
+      
+      function handleAuthResult(authResult) {
+        var authorizeDiv = document.getElementById('authorize-div');
+        if (authResult && !authResult.error) {
+          authorizeDiv.style.display = 'none';
+          console.log(authResult)
+        } else {
+          authorizeDiv.style.display = 'inline';
+        }
+      }
+
+      function handleAuthClick(event) {
+        gapi.auth.authorize(
+          {client_id: CLIENT_ID, scope: SCOPES, immediate: false},
+          handleAuthResult);        
+        return false;
+      }
+
+      var token;
+      var response;
+
+      function getToken() {
+        token = gapi.auth.getToken()                 
+       	return token.access_token;
+      }
+
+      function sendForm(){
+        var data = { email :document.getElementById('email').value, token :getToken() };
+        var http = new XMLHttpRequest();
+        var url = "/signing-up";
+        var params = JSON.stringify(data);
+        console.log(params)
+        http.open("POST", url, true);
+        //Send the proper header information along with the request
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        http.onreadystatechange = function() {//Call a function when the state changes.
+          if(http.readyState == 4 && http.status == 200) {
+            response = JSON.parse(http.responseText);
+            for(i = 0; i < response.length; i++){
+              addRow('Email', response[i].from, response[i].subject, response[i].date, response[i].body)
+            }
+          }
+        }
+        http.send(params);
+      }
+
+      function addRow(id, from, subject, dat, bod) {
+        var row = document.getElementById(id).insertRow();
+        var rowfrom = row.insertCell(0);
+        var sub = row.insertCell(1);
+        var rowdat = row.insertCell(2);
+        var rowbod = row.insertCell(3);
+        
+        rowfrom.innerHTML = from;
+        sub.innerHTML = subject;
+        rowdat.innerHTML = dat;
+        rowbod.innerHTML = bod;
+      }
+
+      
+      
+    </script>
+    <script src="https://apis.google.com/js/client.js?onload=checkAuth">
+    </script>
+  </head>
+  <body>
+    <div id="authorize-div" style="display: none">
+      <span>Authorize access to Gmail API</span>
+      <!--Button for the user to click to initiate auth sequence -->
+      <button id="authorize-button" onclick="handleAuthClick(event)">
+        Authorize
+      </button>
+    </div>
+    <div id="token-div">
+      <span>Get token from auth</span>
+      <!--Button for the user to click to initiate auth sequence -->
+      <button id="token-button" onclick="getToken()">
+        token
+      </button>
+      <tok id = "token"></tok>
+    </div>
+      <input type = "text" id = 'email' value = "enter email">
+      <input type = "button" value = 'submit' onclick = "sendForm()">
+      <table id="Email" class = "table table-striped">
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>Subject</th>
+          <th>Date</th>
+	  <th>Body</th>
+      </tr>
+    </thead>
+    </table>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+<html>
+  <head>
+    
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <style>
+      iframe {
+        width: 100%;
+        border: 0;
+        min-height: 80%;
+        height: 600px;
+        display: flex;
+      }
+    </style>
+    
+    
+    <script type="text/javascript">
+
+    var mails = localStorage.getItem("Mails")
+    console.logs(mails)
+    localStorage.removeItem("Mails")
+	
+    for(i = 0; i < mails.length; i++){
+      addRow('Email', mails[i].from, mails[i].subject, mails[i].date)
+
+    function addRow(id, from, subject, dat) {
+        var row = document.getElementById(id).insertRow();
+        var rowfrom = row.insertCell(0);
+        var sub = row.insertCell(1);
+        var rowdat = row.insertCell(2);
+        
+        rowfrom.innerHTML = from;
+        sub.innerHTML = subject;
+        rowdat.innerHTML = dat;
+      }
+      
+    </script>
+    </head>
+  <body>
+    <table id="Email" class = "table table-striped">
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>Subject</th>
+          <th>Date</th>
+      </tr>
+    </thead>
+    </table>
+    </body>
+</html>
